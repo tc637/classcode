@@ -63,6 +63,44 @@ def find_tau(r_gas,k_lambda,rho,height):
         delta_tau=r_gas*rho[index]*k_lambda*delta_z
         tau[index+1]=tau[index] + delta_tau
     return tau     
+  
+  
+def radiances(tau,Temp,height,T_surf):
+   """
+      calculate the radiance at every level, by building from bottom up 
+      and from top down
+      
+       input: tau = vertical optical depth from the surface
+              Temp = temp array of the atmosphere at each layer, K
+              height = array of levels, m
+              T_surf = surface temperature, K
+       output:
+              numpy arrays: up_rad(W/m^2/sr), down_rad(W/m^2/sr)
+    """
+   import numpy as np
+   sigma_pi = 5.67e-8/np.pi
+   up_rad=np.empty_like(height)
+   down_rad=np.empty_like(height)
+   sfc_rad=sigma_pi*T_surf**4.
+   up_rad[0]=sfc_rad
+   tot_levs=len(tau)
+   # now build up_rad from the bottom up
+   #
+   for index in np.arange(1,tot_levs):
+       up_rad[index] = up_rad[index-1]*np.exp(-tau[index])+sigma_pi*Temp[index]**4*(1-np.exp(-tau[index]))
+   # start at the top of the atmosphere
+   # with zero downwelling flux
+   #
+   down_rad[tot_levs-1]=0
+   #
+   # now build down_rad from the top down
+   #
+   for index in range(tot_levs-2,-1,-1):
+       down_rad[index] = down_rad[index+1]*np.exp(-tau[index])+sigma_pi*Temp[index]**4*(1-np.exp(-tau[index]))
+
+   return (up_rad,down_rad)
+   
+   
 
 if __name__=="__main__":
     r_gas=0.01  #kg/kg
@@ -74,22 +112,39 @@ if __name__=="__main__":
     num_levels=15000    
     Temp,press,rho,height=hydrostat(T_surf,p_surf,dT_dz,delta_z,num_levels)
     tau=find_tau(r_gas,k_lambda,rho,height)
+    up_rad,down_rad = radiances(tau,Temp,height,T_surf)
+    
     fig1,axis1=plt.subplots(1,1)
     axis1.plot(tau,height*1.e-3)
     axis1.set_title('vertical optical depth vs. height')
     axis1.set_ylabel('height (km)')
     axis1.set_xlabel('optical depth (no units)')
+    
     fig2,axis2=plt.subplots(1,1)
     axis2.plot(tau,press*1.e-3)
     axis2.invert_yaxis()
     axis2.set_title('vertical optical depth vs. pressure')
     axis2.set_ylabel('pressure (kPa)')
     axis2.set_xlabel('optical depth (no units)')
+    
+    fig3,axis3=plt.subplots(1,1)
+    axis3.plot(up_rad,height*1.e-3,'b-')
+    axis3.plot(down_rad,height*1.e-3,'r--')
+    axis3.set_title('up-radiation and down-radiation vs. height')
+    axis3.set_ylabel('height (km)')
+    axis3.set_xlabel('radiation (W/m^2/sr)')
+    plt.legend(['up_rad','down_rad'])
+    
+    fig4,axis4=plt.subplots(1,1)
+    # remove last couple of elements, due to harsh value of 0 at down_rad[-1]
+    axis4.plot(up_rad[0:-8]-down_rad[0:-8],height[0:-8]*1.e-3,'m-')
+    axis4.set_title('difference between up- and down-radiation vs. height')
+    axis4.set_ylabel('height (km)')
+    axis4.set_xlabel('radiation difference (W/m^2/sr)')
     plt.show()    
 
 
 
-            #
             
             
      
