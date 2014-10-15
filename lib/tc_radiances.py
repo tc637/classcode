@@ -87,7 +87,7 @@ def radiances(tau,Temp,height,T_surf):
    # now build up_rad from the bottom up
    #
    for index in np.arange(1,tot_levs):
-       up_rad[index] = up_rad[index-1]*np.exp(-tau[index])+sigma_pi*Temp[index]**4*(1-np.exp(-tau[index]))
+       up_rad[index] = up_rad[index-1]*np.exp(-tau[index])+sigma_pi*(Temp[index]**4)*(1-np.exp(-tau[index]))
    # start at the top of the atmosphere
    # with zero downwelling flux
    #
