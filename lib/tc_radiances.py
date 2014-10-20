@@ -68,7 +68,7 @@ def find_tau(r_gas,k_lambda,rho,height):
 def radiances(tau,Temp,height,T_surf):
    """
       calculate the radiance at every level, by building from bottom up 
-      and from top down
+      and from top down (using Schwartzchild's equation)
       
        input: tau = vertical optical depth from the surface
               Temp = temp array of the atmosphere at each layer, K
@@ -77,7 +77,6 @@ def radiances(tau,Temp,height,T_surf):
        output:
               numpy arrays: up_rad(W/m^2/sr), down_rad(W/m^2/sr)
     """
-   import numpy as np
    sigma_pi = 5.67e-8/np.pi
    up_rad=np.empty_like(height)
    down_rad=np.empty_like(height)
@@ -86,17 +85,19 @@ def radiances(tau,Temp,height,T_surf):
    tot_levs=len(tau)
    # now build up_rad from the bottom up
    #
-   for index in np.arange(1,tot_levs):
-       up_rad[index] = up_rad[index-1]*np.exp(-tau[index])+sigma_pi*(Temp[index]**4)*(1-np.exp(-tau[index]))
+   
    # start at the top of the atmosphere
    # with zero downwelling flux
+   for index in np.arange(1,tot_levs):
+       up_rad[index] = up_rad[index-1]*np.exp(-(tau[index]-tau[index-1]))+sigma_pi*(Temp[index]**4)*(1.-np.exp(-(tau[index]-tau[index-1])))
    #
-   down_rad[tot_levs-1]=0
+
    #
    # now build down_rad from the top down
    #
+   down_rad[tot_levs-1] = 0
    for index in range(tot_levs-2,-1,-1):
-       down_rad[index] = down_rad[index+1]*np.exp(-tau[index])+sigma_pi*Temp[index]**4*(1-np.exp(-tau[index]))
+       down_rad[index] = down_rad[index+1]*np.exp(-(tau[index+1]-tau[index]))+sigma_pi*Temp[index]**4*(1-np.exp(-(tau[index+1]-tau[index])))
 
    return (up_rad,down_rad)
    
@@ -130,17 +131,17 @@ if __name__=="__main__":
     fig3,axis3=plt.subplots(1,1)
     axis3.plot(up_rad,height*1.e-3,'b-')
     axis3.plot(down_rad,height*1.e-3,'r--')
-    axis3.set_title('up-radiation and down-radiation vs. height')
+    axis3.set_title('up-radiance and down-radiance vs. height')
     axis3.set_ylabel('height (km)')
-    axis3.set_xlabel('radiation (W/m^2/sr)')
+    axis3.set_xlabel(r'radiance ($W\ m^{-2}\ sr^{-1}$)')
     plt.legend(['up_rad','down_rad'])
     
     fig4,axis4=plt.subplots(1,1)
-    # remove last couple of elements, due to harsh value of 0 at down_rad[-1]
-    axis4.plot(up_rad[0:-8]-down_rad[0:-8],height[0:-8]*1.e-3,'m-')
-    axis4.set_title('difference between up- and down-radiation vs. height')
+    axis4.plot(up_rad-down_rad,height*1.e-3,'m-')
+    axis4.set_title('difference between up- and down-radiance vs. height')
     axis4.set_ylabel('height (km)')
-    axis4.set_xlabel('radiation difference (W/m^2/sr)')
+    axis4.set_xlabel(r'radiance difference ($W\ m^{-2}\ sr^{-1}$)')
+  
     plt.show()    
 
 
