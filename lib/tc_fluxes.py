@@ -125,7 +125,7 @@ def heating_rate(up_flux,down_flux,rho,height):
     
     for index in np.arange(0,len(dF)):
         dFdz = dF[index]/dz[index] # calculate dF/dz
-        heating_rate[index] = (1/(rho[index]*c_pd))*dFdz # K/s
+        heating_rate[index] = (-1/(rho[index]*c_pd))*dFdz # K/s
         
     return heating_rate
         
