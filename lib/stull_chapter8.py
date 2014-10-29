@@ -141,7 +141,7 @@ if __name__=="__main__":
     print(gap)
     print('A10\n\n')
         
-    for key,value in a10_11.iteritems():
+    for key,value in sorted(a10_11.iteritems()):
         width = beamwidth(value[0],value[1])
         
         print('{}: {:>4.3f} degrees\n'.format(key,width))
@@ -149,7 +149,7 @@ if __name__=="__main__":
     print(gap)
     print('A11\n\n')
     
-    for key,value in a10_11.iteritems():
+    for key,value in sorted(a10_11.iteritems()):
         band = bands(value[0])
         
         print('{}: {:>2}\n'.format(key,band))
@@ -157,7 +157,7 @@ if __name__=="__main__":
     print(gap)
     print('A12\n\n')
     
-    for key,value in a12.iteritems():
+    for key,value in sorted(a12.iteritems()):
         distance = (beam_range(value))/1000.
         
         print('{}: {:>6.2f} km\n'.format(key,distance))
@@ -165,15 +165,15 @@ if __name__=="__main__":
     print(gap)
     print('A13\n\n')
     
-    for key,value in a13.iteritems():
+    for key,value in sorted(a13.iteritems()):
         MUR = max_range(value)/1000.
         
-        print('{}: {:>5} km\n'.format(key,value))
+        print('{}: {:>6.1f} km\n'.format(key,MUR))
         
     print(gap)
     print('A14\n\n')
     
-    for key,value in a13.iteritems():
+    for key,value in sorted(a13.iteritems()):
         MUVi = doppler_velocity(value,a14[0])
         MUVii = doppler_velocity(value,a14[1])
         
