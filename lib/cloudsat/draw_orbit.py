@@ -5,12 +5,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pyhdf.SD
 #
-# read the lat lons from the mat file prepared
-# by readgeo.m
 #
 from readcloudsat import get_geo
 
 radarFile='2008291181813_13156_CS_2B-GEOPROF_GRANULE_P_R04_E02.hdf'
+radarFile='2010247105814_23156_CS_2B-GEOPROF_GRANULE_P_R04_E03.h5'
 lat,lon,time_vals,time_seconds,dem_elevation=get_geo(radarFile)
 fig1=plt.figure(1,figsize=(4,5),dpi=150)
 fig1.clf()
