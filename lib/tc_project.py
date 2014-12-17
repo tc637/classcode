@@ -49,6 +49,8 @@ def color_edit(ax,image,xlim,ylim,title,bar_label,font_size):
              ax.get_xticklabels() + ax.get_yticklabels()):
                  item.set_fontsize(font_size)
     
+    
+    
 
 def proj_edit(ax,proj,parallels,meridians,longitude,latitude,temp_grid,bar_label,title):
     """Modifies a Basemap projection.
@@ -63,7 +65,7 @@ def proj_edit(ax,proj,parallels,meridians,longitude,latitude,temp_grid,bar_label
         meridians: tuple of longitudes
         longitude: array of longitudes of the swath
         latitude: array of latitudes of the swath
-        Tb_grid: array of gridded temperatures
+        temp_grid: array of gridded temperatures
         bar_label: string for the colorbar label
         title: string for the title
          
@@ -79,16 +81,21 @@ def proj_edit(ax,proj,parallels,meridians,longitude,latitude,temp_grid,bar_label
                   fontsize=10, latmax=90)
                   
     # draw coast & fill continents
-#map.fillcontinents(color=[0.25, 0.25, 0.25], lake_color=None) # coral
                   
     out=proj.drawcoastlines(linewidth=1.5, linestyle='solid', color='k')
     x, y=proj(longitude, latitude)
+    
+    # fill in colors for temperature
+    
     CS=proj.pcolor(x, y, temp_grid, cmap=plt.cm.hot)
                   
     # create colorbar
                   
     CBar=proj.colorbar(CS, 'right', size='5%', pad='5%')
     CBar.set_label(bar_label)
+    
+    # title
+    
     title=ax.set_title(title)
         
     
